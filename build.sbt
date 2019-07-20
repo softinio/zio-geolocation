@@ -11,7 +11,7 @@ addCommandAlias("check", "all scalafmtSbtCheck scalafmtCheck test:scalafmtCheck"
 val zioVersion      = "1.0.0-RC9"
 val sttpVersion     = "1.6.0"
 val scalaIsoVersion = "0.1.2"
-val json4sVersion    = "3.6.0"
+val json4sVersion   = "3.6.0"
 val specs2Version   = "4.6.0"
 
 libraryDependencies ++= Seq(
