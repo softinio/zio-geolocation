@@ -18,6 +18,6 @@ class GeocodingAPISpec extends Specification with DefaultRuntime {
       )
     unsafeRun(for {
       locations <- GeocodingAPI.getLocation(request).flip
-    } yield (locations must_=== "REQUEST_DENIED"))
+    } yield (locations.getMessage must_=== "REQUEST_DENIED"))
   }
 }

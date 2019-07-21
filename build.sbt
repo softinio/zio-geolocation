@@ -8,7 +8,8 @@ ThisBuild / organizationName := "softinio.com"
 addCommandAlias("fmt", "all scalafmtSbt scalafmt test:scalafmt")
 addCommandAlias("check", "all scalafmtSbtCheck scalafmtCheck test:scalafmtCheck")
 
-val zioVersion      = "1.0.0-RC9"
+val zioVersion      = "1.0.0-RC10-1"
+val zioCatsVersion  = "2.0.0.0-RC1"
 val sttpVersion     = "1.6.3"
 val scalaIsoVersion = "0.1.2"
 val circeVersion    = "0.11.1"
@@ -17,6 +18,7 @@ val http4sVersion   = "0.20.6"
 
 libraryDependencies ++= Seq(
   "dev.zio"               %% "zio"                           % zioVersion,
+  "dev.zio"               %% "zio-interop-cats"              % zioCatsVersion,
   "com.vitorsvieira"      %% "scala-iso"                     % scalaIsoVersion,
   "com.softwaremill.sttp" %% "core"                          % sttpVersion,
   "com.softwaremill.sttp" %% "async-http-client-backend-zio" % sttpVersion,
@@ -24,6 +26,7 @@ libraryDependencies ++= Seq(
   "org.http4s"            %% "http4s-dsl"                    % http4sVersion,
   "org.http4s"            %% "http4s-blaze-server"           % http4sVersion,
   "org.http4s"            %% "http4s-blaze-client"           % http4sVersion,
+  "org.http4s"            %% "http4s-circe"                  % http4sVersion,
   "io.circe"              %% "circe-core"                    % circeVersion,
   "io.circe"              %% "circe-generic"                 % circeVersion,
   "io.circe"              %% "circe-parser"                  % circeVersion,

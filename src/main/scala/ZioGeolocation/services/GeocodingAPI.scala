@@ -16,7 +16,7 @@ object GeocodingAPI {
   implicit val backend       = HttpURLConnectionBackend()
   val geocodeUrl: String     = "https://maps.googleapis.com/maps/api/geocode/json"
 
-  def getLocation(requestDetails: GeoRequest): IO[String, GeoResponse] = {
+  def getLocation(requestDetails: GeoRequest): Task[GeoResponse] = {
     val validCountryCode: Option[String] = requestDetails.countryComponent.map(ISOCountry(_).toString)
     val url =
       uri"$geocodeUrl?address=$requestDetails.address&key=$requestDetails.key&postal_code=$requestDetails.postalCodeComponent&country=$validCountryCode"
@@ -26,12 +26,12 @@ object GeocodingAPI {
       .send()
 
     response.body match {
-      case Left(error)   => ZIO.fail(error)
+      case Left(error)   => ZIO.fail(new Exception(error))
       case Right(received) => {
         received match {
-          case Left(jsonError) => ZIO.fail(jsonError.message)
+          case Left(jsonError) => ZIO.fail(new Exception(jsonError.message))
           case Right(parsed) => {
-            if (parsed.results.isEmpty) ZIO.fail(parsed.status)
+            if (parsed.results.isEmpty) ZIO.fail(new Exception(parsed.status))
             else ZIO.succeed(parsed)
           }
         }
