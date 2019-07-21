@@ -11,8 +11,6 @@ import zio.clock.Clock
 import zio.console._
 import zio.interop.catz._
 
-
-
 object Main extends App {
 
   type AppEnvironment = Clock with Geocoding
@@ -22,7 +20,7 @@ object Main extends App {
   override def run(args: List[String]): ZIO[Environment, Nothing, Int] = {
     val program: ZIO[Main.Environment, Throwable, Unit] = for {
       // conf        <- configuration.load.provide(Configuration.Live)
-      blockingEC  <- blocking.blockingExecutor.map(_.asEC).provide(Blocking.Live)
+      blockingEC <- blocking.blockingExecutor.map(_.asEC).provide(Blocking.Live)
 
       httpApp = Router[AppTask](
         // "/geocode" -> Api(s"${conf.api.endpoint}/geocode").route
@@ -30,13 +28,13 @@ object Main extends App {
       ).orNotFound
 
       server = ZIO.runtime[AppEnvironment].flatMap { implicit rts =>
-          BlazeServerBuilder[AppTask]
-            // .bindHttp(conf.api.port, "0.0.0.0")
-            .bindHttp(8000, "0.0.0.0")
-            .withHttpApp(CORS(httpApp))
-            .serve
-            .compile[AppTask, AppTask, ExitCode]
-            .drain
+        BlazeServerBuilder[AppTask]
+        // .bindHttp(conf.api.port, "0.0.0.0")
+          .bindHttp(8000, "0.0.0.0")
+          .withHttpApp(CORS(httpApp))
+          .serve
+          .compile[AppTask, AppTask, ExitCode]
+          .drain
       }
     } yield server
 
@@ -46,4 +44,3 @@ object Main extends App {
     )
   }
 }
-

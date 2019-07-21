@@ -8,10 +8,13 @@ package object geocoding extends Geocoding.Service[Geocoding] {
     postalCode: Option[String],
     countryCode: Option[String],
     settings: GeocodingSettings
-    ): TaskR[Geocoding, List[Response]] = ZIO.accessM(_.userGeocoding.get(
+  ): TaskR[Geocoding, List[Response]] =
+    ZIO.accessM(
+      _.userGeocoding.get(
         address,
         postalCode,
         countryCode,
         settings
-      ))
+      )
+    )
 }

@@ -11,11 +11,11 @@ class GeocodingAPISpec extends Specification with DefaultRuntime {
   def e1 = {
     val sampleAddress: String = "44 Montgomery St, San Francisco, CA 94104"
     val request: GeoRequest = GeoRequest(
-        address = sampleAddress,
-        key = "",
-        postalCodeComponent = None,
-        countryComponent = None
-      )
+      address = sampleAddress,
+      key = "",
+      postalCodeComponent = None,
+      countryComponent = None
+    )
     unsafeRun(for {
       locations <- GeocodingAPI.getLocation(request).flip
     } yield (locations.getMessage must_=== "REQUEST_DENIED"))

@@ -10,4 +10,3 @@ final case class Request(
   postalCode: Option[String],
   countryCode: Option[String]
 )
-

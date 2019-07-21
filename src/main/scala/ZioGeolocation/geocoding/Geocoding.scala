@@ -3,7 +3,7 @@ package ZioGeolocation
 import zio._
 
 trait Geocoding extends Serializable {
-  val userGeocoding : Geocoding.Service[Any]
+  val userGeocoding: Geocoding.Service[Any]
 }
 
 object Geocoding {
@@ -13,18 +13,17 @@ object Geocoding {
       postalCode: Option[String],
       countryCode: Option[String],
       settings: GeocodingSettings
-      ): TaskR[R, List[Response]]
+    ): TaskR[R, List[Response]]
   }
 }
 
 trait Live extends Geocoding {
   override val userGeocoding: Geocoding.Service[Any] = new Geocoding.Service[Any] {
-    private def createResponse(location: Results): Response = {
-        Response(
-          address = location.formattedAddress,
-          quality = location.geometry.locationType,
-        )
-    }
+    private def createResponse(location: Results): Response =
+      Response(
+        address = location.formattedAddress,
+        quality = location.geometry.locationType
+      )
 
     def get(
       address: String,
@@ -44,4 +43,3 @@ trait Live extends Geocoding {
     }
   }
 }
-
