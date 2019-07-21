@@ -13,7 +13,8 @@ object Build {
           "-Ywarn-unused:_,imports",
           "-Ywarn-unused:imports",
           "-opt:l:inline",
-          "-opt-inline-from:<source>"
+          "-opt-inline-from:<source>",
+          "-Ypartial-unification"
         )
       case _ =>
         Seq(

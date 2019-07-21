@@ -9,18 +9,24 @@ addCommandAlias("fmt", "all scalafmtSbt scalafmt test:scalafmt")
 addCommandAlias("check", "all scalafmtSbtCheck scalafmtCheck test:scalafmtCheck")
 
 val zioVersion      = "1.0.0-RC9"
-val sttpVersion     = "1.6.0"
+val sttpVersion     = "1.6.3"
 val scalaIsoVersion = "0.1.2"
-val json4sVersion   = "3.6.0"
+val circeVersion    = "0.11.1"
 val specs2Version   = "4.6.0"
+val http4sVersion   = "0.20.6"
 
 libraryDependencies ++= Seq(
   "dev.zio"               %% "zio"                           % zioVersion,
   "com.vitorsvieira"      %% "scala-iso"                     % scalaIsoVersion,
   "com.softwaremill.sttp" %% "core"                          % sttpVersion,
   "com.softwaremill.sttp" %% "async-http-client-backend-zio" % sttpVersion,
-  "com.softwaremill.sttp" %% "json4s"                        % sttpVersion,
-  "org.json4s"            %% "json4s-native"                 % json4sVersion,
+  "com.softwaremill.sttp" %% "circe"                         % sttpVersion,
+  "org.http4s"            %% "http4s-dsl"                    % http4sVersion,
+  "org.http4s"            %% "http4s-blaze-server"           % http4sVersion,
+  "org.http4s"            %% "http4s-blaze-client"           % http4sVersion,
+  "io.circe"              %% "circe-core"                    % circeVersion,
+  "io.circe"              %% "circe-generic"                 % circeVersion,
+  "io.circe"              %% "circe-parser"                  % circeVersion,
   "org.specs2"            %% "specs2-core"                   % specs2Version % "test",
   "org.specs2"            %% "specs2-scalacheck"             % specs2Version % Test,
   "org.specs2"            %% "specs2-matcher-extra"          % specs2Version % Test

@@ -1,9 +1,9 @@
 package ZioGeolocation
 
+import io.circe.generic.auto._, io.circe.syntax._
 import com.softwaremill.sttp._
-import com.softwaremill.sttp.json4s._
+import com.softwaremill.sttp.circe._
 import com.vitorsvieira.iso._
-import org.json4s.native.Serialization
 import zio._
 
 /**
@@ -13,7 +13,6 @@ import zio._
  *
  */
 object GeocodingAPI {
-  implicit val serialization = Serialization
   implicit val backend       = HttpURLConnectionBackend()
   val geocodeUrl: String     = "https://maps.googleapis.com/maps/api/geocode/json"
 
@@ -29,8 +28,13 @@ object GeocodingAPI {
     response.body match {
       case Left(error)   => ZIO.fail(error)
       case Right(received) => {
-        if (received.results.isEmpty) ZIO.fail(received.status)
-        else ZIO.succeed(received)
+        received match {
+          case Left(jsonError) => ZIO.fail(jsonError.message)
+          case Right(parsed) => {
+            if (parsed.results.isEmpty) ZIO.fail(parsed.status)
+            else ZIO.succeed(parsed)
+          }
+        }
       }
     }
   }
