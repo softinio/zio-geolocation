@@ -26,12 +26,13 @@ object Configuration {
   trait Service[R] {
     val load: TaskR[R, Config]
   }
-
-  trait Live extends Configuration {
-    val config: Service[Any] = new Service[Any] {
-      val load: Task[Config] = Task.effect(loadConfigOrThrow[Config])
-    }
-  }
-
-  object Live extends Live
 }
+
+trait ConfigLive extends Configuration {
+  override val config: Configuration.Service[Any] = new Configuration.Service[Any] {
+    val load: Task[Config] = Task.effect(loadConfigOrThrow[Config])
+  }
+}
+
+object ConfigurationLive extends ConfigLive
+

@@ -17,7 +17,7 @@ object Geocoding {
   }
 }
 
-trait Live extends Geocoding {
+trait GeoLive extends Geocoding {
   override val userGeocoding: Geocoding.Service[Any] = new Geocoding.Service[Any] {
     private def createResponse(location: Results): Response =
       Response(
@@ -43,3 +43,5 @@ trait Live extends Geocoding {
     }
   }
 }
+
+object GeocodingLive extends GeoLive

@@ -13,20 +13,20 @@ import zio.interop.catz._
 
 object Main extends App {
 
-  type AppEnvironment = Clock with Geocoding with Configuration
+  type AppEnvironment = Console with Clock with Geocoding with Configuration
 
   type AppTask[A] = TaskR[AppEnvironment, A]
 
   override def run(args: List[String]): ZIO[Environment, Nothing, Int] = {
     val program: ZIO[Main.Environment, Throwable, Unit] = for {
-      conf        <- configuration.load.provide(Configuration.Live)
+      conf        <- configuration.load.provide(ConfigurationLive)
       blockingEC <- blocking.blockingExecutor.map(_.asEC).provide(Blocking.Live)
 
       httpApp = Router[AppTask](
-        "/geocode" -> Api(s"${conf.app.endpoint}/geocode").route
+        "/" -> Api(s"${conf.app.endpoint}/").route
       ).orNotFound
 
-      server = ZIO.runtime[AppEnvironment].flatMap { implicit rts =>
+      server <- ZIO.runtime[AppEnvironment].flatMap { implicit rts =>
         BlazeServerBuilder[AppTask]
         .bindHttp(conf.app.port, "0.0.0.0")
           .withHttpApp(CORS(httpApp))
@@ -34,6 +34,14 @@ object Main extends App {
           .compile[AppTask, AppTask, ExitCode]
           .drain
       }
+      .provideSome[Environment] { base =>
+            new Console with Clock with Geocoding with Configuration {
+              override val console: Console.Service[Any] = base.console
+              override val clock: Clock.Service[Any] = base.clock 
+              override val config: Configuration.Service[Any] = ConfigurationLive.config
+              override val userGeocoding: Geocoding.Service[Any] = GeocodingLive.userGeocoding
+            }
+          }
     } yield server
 
     program.foldM(

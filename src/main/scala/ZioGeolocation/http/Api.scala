@@ -9,6 +9,8 @@ import zio._
 import zio.interop.catz._
 
 final case class Api[R <: Geocoding](rootUri: String) {
+  println(rootUri)
+
   type GeoIO[A] = TaskR[R, A]
 
   implicit def circeJsonDecoder[A](implicit decoder: Decoder[A]): EntityDecoder[GeoIO, A] = jsonOf[GeoIO, A]
@@ -20,10 +22,11 @@ final case class Api[R <: Geocoding](rootUri: String) {
 
   def route: HttpRoutes[GeoIO] =
     HttpRoutes.of[GeoIO] {
+      case GET -> Root / "ping" => Ok("pong")
       case request @ POST -> Root =>
         request.decode[Request] { req => 
           for {
-            cfg <- configuration.load.provide(Configuration.Live)
+            cfg <- configuration.load.provide(ConfigurationLive)
             result <- geocoding.get(
                 address = req.address,
                 postalCode = req.postalCode,
