@@ -35,4 +35,3 @@ trait ConfigLive extends Configuration {
 }
 
 object ConfigurationLive extends ConfigLive
-

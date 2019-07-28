@@ -19,29 +19,31 @@ object Main extends App {
 
   override def run(args: List[String]): ZIO[Environment, Nothing, Int] = {
     val program: ZIO[Main.Environment, Throwable, Unit] = for {
-      conf        <- configuration.load.provide(ConfigurationLive)
+      conf       <- configuration.load.provide(ConfigurationLive)
       blockingEC <- blocking.blockingExecutor.map(_.asEC).provide(Blocking.Live)
 
       httpApp = Router[AppTask](
         "/" -> Api(s"${conf.app.endpoint}/").route
       ).orNotFound
 
-      server <- ZIO.runtime[AppEnvironment].flatMap { implicit rts =>
-        BlazeServerBuilder[AppTask]
-        .bindHttp(conf.app.port, "0.0.0.0")
-          .withHttpApp(CORS(httpApp))
-          .serve
-          .compile[AppTask, AppTask, ExitCode]
-          .drain
-      }
-      .provideSome[Environment] { base =>
-            new Console with Clock with Geocoding with Configuration {
-              override val console: Console.Service[Any] = base.console
-              override val clock: Clock.Service[Any] = base.clock 
-              override val config: Configuration.Service[Any] = ConfigurationLive.config
-              override val userGeocoding: Geocoding.Service[Any] = GeocodingLive.userGeocoding
-            }
-          }
+      server <- ZIO
+                 .runtime[AppEnvironment]
+                 .flatMap { implicit rts =>
+                   BlazeServerBuilder[AppTask]
+                     .bindHttp(conf.app.port, "0.0.0.0")
+                     .withHttpApp(CORS(httpApp))
+                     .serve
+                     .compile[AppTask, AppTask, ExitCode]
+                     .drain
+                 }
+                 .provideSome[Environment] { base =>
+                   new Console with Clock with Geocoding with Configuration {
+                     override val console: Console.Service[Any]         = base.console
+                     override val clock: Clock.Service[Any]             = base.clock
+                     override val config: Configuration.Service[Any]    = ConfigurationLive.config
+                     override val userGeocoding: Geocoding.Service[Any] = GeocodingLive.userGeocoding
+                   }
+                 }
     } yield server
 
     program.foldM(
