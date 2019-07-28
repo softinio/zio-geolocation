@@ -21,15 +21,17 @@ final case class Api[R <: Geocoding](rootUri: String) {
   def route: HttpRoutes[GeoIO] =
     HttpRoutes.of[GeoIO] {
       case request @ POST -> Root =>
-        request.decode[Request] { req =>
-          Created(
-            geocoding.get(
-              address = req.address,
-              postalCode = req.postalCode,
-              countryCode = req.countryCode,
-              settings = GeocodingSettings(apiKey = "")
-            )
-          )
-        }
-    }
+        request.decode[Request] { req => 
+          for {
+            cfg <- configuration.load.provide(Configuration.Live)
+            result <- geocoding.get(
+                address = req.address,
+                postalCode = req.postalCode,
+                countryCode = req.countryCode,
+                settings = GeocodingSettings(apiKey = cfg.geocoding.apikey))
+            response <- Created(result)
+
+          } yield response
+      }
+  }
 }
