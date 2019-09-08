@@ -1,20 +1,21 @@
 import Build._
 
-ThisBuild / scalaVersion := "2.12.8"
+ThisBuild / scalaVersion := "2.12.9"
 ThisBuild / version := "0.1.0-SNAPSHOT"
 ThisBuild / organization := "com.softinio"
 ThisBuild / organizationName := "softinio.com"
+ThisBuild / turbo := false
 
 addCommandAlias("fmt", "all scalafmtSbt scalafmt test:scalafmt")
 addCommandAlias("check", "all scalafmtSbtCheck scalafmtCheck test:scalafmtCheck")
 
-val zioVersion        = "1.0.0-RC10-1"
-val zioCatsVersion    = "2.0.0.0-RC1"
-val sttpVersion       = "1.6.3"
+val zioVersion        = "1.0.0-RC12-1"
+val zioCatsVersion    = "2.0.0.0-RC3"
+val sttpVersion       = "1.6.6"
 val scalaIsoVersion   = "0.1.2"
 val circeVersion      = "0.11.1"
 val pureconfigVersion = "0.11.1"
-val specs2Version     = "4.6.0"
+val specs2Version     = "4.7.0"
 val http4sVersion     = "0.20.6"
 
 libraryDependencies ++= Seq(
