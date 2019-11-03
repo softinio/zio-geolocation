@@ -16,8 +16,8 @@
 
 package ZioGeolocation
 
-import zio.TaskR
+import zio.RIO
 
 package object configuration extends Configuration.Service[Configuration] {
-  val load: TaskR[Configuration, Config] = TaskR.accessM(_.config.load)
+  val load: RIO[Configuration, Config] = RIO.accessM(_.config.load)
 }

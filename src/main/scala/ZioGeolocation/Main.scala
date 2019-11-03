@@ -33,8 +33,8 @@ object Main extends App {
 
   type AppTask[A] = TaskR[AppEnvironment, A]
 
-  override def run(args: List[String]): ZIO[Environment, Nothing, Int] = {
-    val program: ZIO[Main.Environment, Throwable, Unit] = for {
+  override def run(args: List[String]): ZIO[ZEnv, Nothing, Int] = {
+    val program: ZIO[ZEnv, Throwable, Unit] = for {
       conf       <- configuration.load.provide(ConfigurationLive)
       blockingEC <- blocking.blockingExecutor.map(_.asEC).provide(Blocking.Live)
 
@@ -52,7 +52,7 @@ object Main extends App {
                      .compile[AppTask, AppTask, ExitCode]
                      .drain
                  }
-                 .provideSome[Environment] { base =>
+                 .provideSome[ZEnv] { base =>
                    new Console with Clock with Geocoding with Configuration {
                      override val console: Console.Service[Any]         = base.console
                      override val clock: Clock.Service[Any]             = base.clock

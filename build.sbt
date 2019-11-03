@@ -9,14 +9,14 @@ ThisBuild / turbo := false
 addCommandAlias("fmt", "all scalafmtSbt scalafmt test:scalafmt")
 addCommandAlias("check", "all scalafmtSbtCheck scalafmtCheck test:scalafmtCheck")
 
-val zioVersion        = "1.0.0-RC12-1"
-val zioCatsVersion    = "2.0.0.0-RC3"
-val sttpVersion       = "1.6.6"
+val zioVersion        = "1.0.0-RC16"
+val zioCatsVersion    = "2.0.0.0-RC7"
+val sttpVersion       = "1.7.2"
 val scalaIsoVersion   = "0.1.2"
-val circeVersion      = "0.11.1"
-val pureconfigVersion = "0.11.1"
-val specs2Version     = "4.7.0"
-val http4sVersion     = "0.20.6"
+val circeVersion      = "0.12.3"
+val pureconfigVersion = "0.12.1"
+val specs2Version     = "4.8.0"
+val http4sVersion     = "0.20.12"
 
 libraryDependencies ++= Seq(
   "dev.zio"               %% "zio"                           % zioVersion,
