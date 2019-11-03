@@ -16,9 +16,9 @@
 
 package ZioGeolocation
 
-import pureconfig.loadConfigOrThrow
-import zio.{ Task, TaskR }
 import pureconfig.generic.auto._
+import pureconfig.loadConfigOrThrow
+import zio.{ RIO, Task }
 
 final case class Config(
   app: AppConfig,
@@ -40,7 +40,7 @@ trait Configuration extends Serializable {
 
 object Configuration {
   trait Service[R] {
-    val load: TaskR[R, Config]
+    val load: RIO[R, Config]
   }
 }
 
