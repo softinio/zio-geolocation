@@ -16,7 +16,7 @@ object Build {
           "-opt-inline-from:<source>",
           "-Ypartial-unification"
         )
-      case _ =>
+      case _             =>
         Seq(
           "-Xexperimental",
           "-Ywarn-unused-import"

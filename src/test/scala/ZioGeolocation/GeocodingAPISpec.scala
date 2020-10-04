@@ -22,16 +22,16 @@ import zio.test._
 object GeocodingAPISpec extends DefaultRunnableSpec {
   def spec = suite("GeocodingAPISpec")(
     testM("Calling API and Being Denied Access") {
-    val sampleAddress: String = "44 Montgomery St, San Francisco, CA 94104"
-    val request: GeoRequest = GeoRequest(
-      address = sampleAddress,
-      key = "",
-      postalCodeComponent = None,
-      countryComponent = None
-    )
-    for {
-      locations <- GeocodingAPI.getLocation(request).flip
-    } yield assert(locations.getMessage)(equalTo("REQUEST_DENIED"))
+      val sampleAddress: String = "44 Montgomery St, San Francisco, CA 94104"
+      val request: GeoRequest   = GeoRequest(
+        address = sampleAddress,
+        key = "",
+        postalCodeComponent = None,
+        countryComponent = None
+      )
+      for {
+        locations <- GeocodingAPI.getLocation(request).flip
+      } yield assert(locations.getMessage)(equalTo("REQUEST_DENIED"))
     }
   )
 }

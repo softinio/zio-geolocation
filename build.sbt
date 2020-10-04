@@ -17,7 +17,6 @@ val circeVersion      = "0.12.3"
 val pureconfigVersion = "0.14.0"
 val http4sVersion     = "0.21.7"
 
-
 lazy val root =
   (project in file("."))
     .settings(
@@ -40,7 +39,7 @@ lazy val root =
         "io.circe"              %% "circe-core"                    % circeVersion,
         "io.circe"              %% "circe-generic"                 % circeVersion,
         "io.circe"              %% "circe-parser"                  % circeVersion,
-        "com.github.pureconfig" %% "pureconfig"                    % pureconfigVersion,
+        "com.github.pureconfig" %% "pureconfig"                    % pureconfigVersion
       ),
       testFrameworks := Seq(new TestFramework("zio.test.sbt.ZTestFramework"))
     )

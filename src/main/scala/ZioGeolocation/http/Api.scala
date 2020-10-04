@@ -40,17 +40,17 @@ final case class Api[R <: Geocoding](rootUri: String) {
 
   def route: HttpRoutes[GeoIO] =
     HttpRoutes.of[GeoIO] {
-      case GET -> Root / "ping" => Ok("pong")
+      case GET -> Root / "ping"   => Ok("pong")
       case request @ POST -> Root =>
         request.decode[Request] { req =>
           for {
-            cfg <- configuration.geocodingConfig.provideSomeLayer(Configuration.live)
-            result <- geocoding.getGeo(
-                       address = req.address,
-                       postalCode = req.postalCode,
-                       countryCode = req.countryCode,
-                       settings = GeocodingSettings(apiKey = cfg.apikey)
-                     )
+            cfg      <- configuration.geocodingConfig.provideSomeLayer(Configuration.live)
+            result   <- geocoding.getGeo(
+                          address = req.address,
+                          postalCode = req.postalCode,
+                          countryCode = req.countryCode,
+                          settings = GeocodingSettings(apiKey = cfg.apikey)
+                        )
             response <- Created(result)
 
           } yield response

@@ -17,9 +17,7 @@
 package ZioGeolocation
 
 /**
- *
  * Algrebra Data Types descibing the request received via http
- *
  */
 final case class Request(
   address: String,

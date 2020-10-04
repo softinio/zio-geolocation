@@ -18,7 +18,7 @@ package ZioGeolocation
 
 import pureconfig.generic.auto._
 import pureconfig.ConfigSource
-import zio.{Has, Layer, URIO, Task, ZIO, ZLayer}
+import zio.{ Has, Layer, Task, URIO, ZIO, ZLayer }
 
 package object configuration {
 
@@ -38,15 +38,15 @@ package object configuration {
     apikey: String
   )
 
-  val appConfig: URIO[Has[AppConfig], AppConfig] = ZIO.access(_.get)
+  val appConfig: URIO[Has[AppConfig], AppConfig]                   = ZIO.access(_.get)
   val geocodingConfig: URIO[Has[GeocodingConfig], GeocodingConfig] = ZIO.access(_.get)
 
-object Configuration {
+  object Configuration {
 
-  val live: Layer[Throwable, Configuration] = ZLayer.fromEffectMany(
-    Task
-      .effect(ConfigSource.default.loadOrThrow[Config])
-      .map(c => Has(c.app) ++ Has(c.geocoding))
-  )
-}
+    val live: Layer[Throwable, Configuration] = ZLayer.fromEffectMany(
+      Task
+        .effect(ConfigSource.default.loadOrThrow[Config])
+        .map(c => Has(c.app) ++ Has(c.geocoding))
+    )
+  }
 }

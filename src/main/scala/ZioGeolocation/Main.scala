@@ -16,7 +16,7 @@
 
 package ZioGeolocation
 
-import cats.effect.{ExitCode => CatsExitCode}
+import cats.effect.{ ExitCode => CatsExitCode }
 import org.http4s.implicits._
 import org.http4s.server.Router
 import org.http4s.server.blaze.BlazeServerBuilder
@@ -41,15 +41,15 @@ object Main extends App {
   override def run(args: List[String]): ZIO[ZEnv, Nothing, ExitCode] = {
     val program: ZIO[AppEnvironment, Throwable, Unit] =
       for {
-        api <- configuration.appConfig
+        api    <- configuration.appConfig
         httpApp = Router[AppTask](
-            "/" -> Api(s"${api.endpoint}/").route
-        ).orNotFound
+                    "/" -> Api(s"${api.endpoint}/").route
+                  ).orNotFound
 
         server <- ZIO
                     .runtime[AppEnvironment]
                     .flatMap { implicit rts =>
-                    BlazeServerBuilder[AppTask]
+                      BlazeServerBuilder[AppTask]
                         .bindHttp(api.port, api.endpoint)
                         .withHttpApp(CORS(httpApp))
                         .serve

@@ -16,7 +16,7 @@
 
 package ZioGeolocation
 
-import zio.{Has, Layer, RIO, ZIO, ZLayer}
+import zio.{ Has, Layer, RIO, ZIO, ZLayer }
 
 package object geocoding {
   type Geocoding = Has[Geocoding.Service]
@@ -45,7 +45,7 @@ package object geocoding {
           Response(
             address = location.formattedAddress,
             quality = location.geometry.locationType
-        )
+          )
 
         def getGeo(
           address: String,
@@ -64,5 +64,6 @@ package object geocoding {
           } yield (locations.results.map(location => createResponse(location)))
         }
       }
-    )}
+    )
+  }
 }
