@@ -16,7 +16,7 @@ object Build {
           "-opt-inline-from:<source>",
           "-Ypartial-unification"
         )
-      case _ =>
+      case _             =>
         Seq(
           "-Xexperimental",
           "-Ywarn-unused-import"
@@ -25,7 +25,7 @@ object Build {
 
   def stdSettings(prjName: String) = Seq(
     name := s"$prjName",
-    crossScalaVersions := Seq("2.12.8"),
+    crossScalaVersions := Seq("2.12.12"),
     scalaVersion in ThisBuild := crossScalaVersions.value.head,
     scalacOptions := extraOptions(scalaVersion.value),
     libraryDependencies ++= compileOnlyDeps ++ Seq(

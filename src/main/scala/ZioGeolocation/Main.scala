@@ -16,7 +16,7 @@
 
 package ZioGeolocation
 
-import cats.effect.ExitCode
+import cats.effect.{ ExitCode => CatsExitCode }
 import org.http4s.implicits._
 import org.http4s.server.Router
 import org.http4s.server.blaze.BlazeServerBuilder
@@ -27,44 +27,40 @@ import zio.clock.Clock
 import zio.console._
 import zio.interop.catz._
 
+import ZioGeolocation.configuration.Configuration
+import ZioGeolocation.geocoding.Geocoding
+
 object Main extends App {
 
-  type AppEnvironment = Console with Clock with Geocoding with Configuration
+  type AppEnvironment = Configuration with Clock with Geocoding
 
-  type AppTask[A] = TaskR[AppEnvironment, A]
+  type AppTask[A] = RIO[AppEnvironment, A]
 
-  override def run(args: List[String]): ZIO[ZEnv, Nothing, Int] = {
-    val program: ZIO[ZEnv, Throwable, Unit] = for {
-      conf       <- configuration.load.provide(ConfigurationLive)
-      blockingEC <- blocking.blockingExecutor.map(_.asEC).provide(Blocking.Live)
+  val appLayers = (Configuration.live ++ Blocking.live) ++ Geocoding.live
 
-      httpApp = Router[AppTask](
-        "/" -> Api(s"${conf.app.endpoint}/").route
-      ).orNotFound
+  override def run(args: List[String]): ZIO[ZEnv, Nothing, ExitCode] = {
+    val program: ZIO[AppEnvironment, Throwable, Unit] =
+      for {
+        api    <- configuration.appConfig
+        httpApp = Router[AppTask](
+                    "/" -> Api(s"${api.endpoint}/").route
+                  ).orNotFound
 
-      server <- ZIO
-                 .runtime[AppEnvironment]
-                 .flatMap { implicit rts =>
-                   BlazeServerBuilder[AppTask]
-                     .bindHttp(conf.app.port, "0.0.0.0")
-                     .withHttpApp(CORS(httpApp))
-                     .serve
-                     .compile[AppTask, AppTask, ExitCode]
-                     .drain
-                 }
-                 .provideSome[ZEnv] { base =>
-                   new Console with Clock with Geocoding with Configuration {
-                     override val console: Console.Service[Any]         = base.console
-                     override val clock: Clock.Service[Any]             = base.clock
-                     override val config: Configuration.Service[Any]    = ConfigurationLive.config
-                     override val userGeocoding: Geocoding.Service[Any] = GeocodingLive.userGeocoding
-                   }
-                 }
-    } yield server
+        server <- ZIO
+                    .runtime[AppEnvironment]
+                    .flatMap { implicit rts =>
+                      BlazeServerBuilder[AppTask]
+                        .bindHttp(api.port, api.endpoint)
+                        .withHttpApp(CORS(httpApp))
+                        .serve
+                        .compile[AppTask, AppTask, CatsExitCode]
+                        .drain
+                    }
+      } yield server
 
-    program.foldM(
-      err => putStrLn(s"Execution failed with: $err") *> IO.succeed(1),
-      _ => IO.succeed(0)
-    )
+    program
+      .provideSomeLayer[ZEnv](appLayers)
+      .tapError(err => putStrLn(s"Execution failed with: $err"))
+      .exitCode
   }
 }

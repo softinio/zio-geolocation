@@ -17,9 +17,7 @@
 package ZioGeolocation
 
 /**
- *
  * Algrebra Data Types descibing the response received from Geocode API
- *
  */
 final case class AddressComponent(longName: String, shortName: String, types: List[String])
 

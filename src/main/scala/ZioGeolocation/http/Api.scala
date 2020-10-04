@@ -24,31 +24,33 @@ import org.http4s.{ EntityDecoder, EntityEncoder, HttpRoutes }
 import zio._
 import zio.interop.catz._
 
+import ZioGeolocation.configuration.Configuration
+import ZioGeolocation.geocoding.Geocoding
+
 final case class Api[R <: Geocoding](rootUri: String) {
   println(rootUri)
 
-  type GeoIO[A] = TaskR[R, A]
+  type GeoIO[A] = RIO[R, A]
 
   implicit def circeJsonDecoder[A](implicit decoder: Decoder[A]): EntityDecoder[GeoIO, A] = jsonOf[GeoIO, A]
-  implicit def circeJsonEncoder[A](implicit decoder: Encoder[A]): EntityEncoder[GeoIO, A] =
-    jsonEncoderOf[GeoIO, A]
+  implicit def circeJsonEncoder[A](implicit decoder: Encoder[A]): EntityEncoder[GeoIO, A] = jsonEncoderOf[GeoIO, A]
 
   val dsl: Http4sDsl[GeoIO] = Http4sDsl[GeoIO]
   import dsl._
 
   def route: HttpRoutes[GeoIO] =
     HttpRoutes.of[GeoIO] {
-      case GET -> Root / "ping" => Ok("pong")
+      case GET -> Root / "ping"   => Ok("pong")
       case request @ POST -> Root =>
         request.decode[Request] { req =>
           for {
-            cfg <- configuration.load.provide(ConfigurationLive)
-            result <- geocoding.get(
-                       address = req.address,
-                       postalCode = req.postalCode,
-                       countryCode = req.countryCode,
-                       settings = GeocodingSettings(apiKey = cfg.geocoding.apikey)
-                     )
+            cfg      <- configuration.geocodingConfig.provideSomeLayer(Configuration.live)
+            result   <- geocoding.getGeo(
+                          address = req.address,
+                          postalCode = req.postalCode,
+                          countryCode = req.countryCode,
+                          settings = GeocodingSettings(apiKey = cfg.apikey)
+                        )
             response <- Created(result)
 
           } yield response

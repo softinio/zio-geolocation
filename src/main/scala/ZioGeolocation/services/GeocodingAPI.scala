@@ -16,17 +16,15 @@
 
 package ZioGeolocation
 
-import io.circe.generic.auto._, io.circe.syntax._
+import io.circe.generic.auto._
 import com.softwaremill.sttp._
 import com.softwaremill.sttp.circe._
 import com.vitorsvieira.iso._
 import zio._
 
 /**
- *
  * Service calling Google's Geocoding API
  * https://developers.google.com/maps/documentation/geocoding/start
- *
  */
 object GeocodingAPI {
   implicit val backend   = HttpURLConnectionBackend()
@@ -34,24 +32,22 @@ object GeocodingAPI {
 
   def getLocation(requestDetails: GeoRequest): Task[GeoResponse] = {
     val validCountryCode: Option[String] = requestDetails.countryComponent.map(ISOCountry(_).toString)
-    val url =
+    val url                              =
       uri"$geocodeUrl?address=$requestDetails.address&key=$requestDetails.key&postal_code=$requestDetails.postalCodeComponent&country=$validCountryCode"
-    val response = sttp
+    val response                         = sttp
       .get(url)
       .response(asJson[GeoResponse])
       .send()
 
     response.body match {
-      case Left(error) => ZIO.fail(new Exception(error))
-      case Right(received) => {
+      case Left(error)     => ZIO.fail(new Exception(error))
+      case Right(received) =>
         received match {
           case Left(jsonError) => ZIO.fail(new Exception(jsonError.message))
-          case Right(parsed) => {
+          case Right(parsed)   =>
             if (parsed.results.isEmpty) ZIO.fail(new Exception(parsed.status))
             else ZIO.succeed(parsed)
-          }
         }
-      }
     }
   }
 }
