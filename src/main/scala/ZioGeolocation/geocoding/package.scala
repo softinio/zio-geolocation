@@ -16,21 +16,53 @@
 
 package ZioGeolocation
 
-import zio.{ TaskR, ZIO }
+import zio.{Has, Layer, RIO, ZIO, ZLayer}
 
-package object geocoding extends Geocoding.Service[Geocoding] {
-  override def get(
+package object geocoding {
+  type Geocoding = Has[Geocoding.Service]
+
+  def getGeo(
     address: String,
     postalCode: Option[String],
     countryCode: Option[String],
     settings: GeocodingSettings
-  ): TaskR[Geocoding, List[Response]] =
-    ZIO.accessM(
-      _.userGeocoding.get(
-        address,
-        postalCode,
-        countryCode,
-        settings
-      )
-    )
+  ): RIO[Geocoding, List[Response]] = ZIO.accessM(_.get.getGeo(address, postalCode, countryCode, settings))
+
+  object Geocoding {
+
+    trait Service {
+      def getGeo(
+        address: String,
+        postalCode: Option[String],
+        countryCode: Option[String],
+        settings: GeocodingSettings
+      ): RIO[Geocoding, List[Response]]
+    }
+
+    val live: Layer[Nothing, Geocoding] = ZLayer.succeed(
+      new Service {
+        private def createResponse(location: Results): Response =
+          Response(
+            address = location.formattedAddress,
+            quality = location.geometry.locationType
+        )
+
+        def getGeo(
+          address: String,
+          postalCode: Option[String],
+          countryCode: Option[String],
+          settings: GeocodingSettings
+        ): RIO[Geocoding, List[Response]] = {
+          val request: GeoRequest = GeoRequest(
+            address = address,
+            key = settings.apiKey,
+            postalCodeComponent = postalCode,
+            countryComponent = countryCode
+          )
+          for {
+            locations <- GeocodingAPI.getLocation(request)
+          } yield (locations.results.map(location => createResponse(location)))
+        }
+      }
+    )}
 }

@@ -16,8 +16,37 @@
 
 package ZioGeolocation
 
-import zio.RIO
+import pureconfig.generic.auto._
+import pureconfig.ConfigSource
+import zio.{Has, Layer, URIO, Task, ZIO, ZLayer}
 
-package object configuration extends Configuration.Service[Configuration] {
-  val load: RIO[Configuration, Config] = RIO.accessM(_.config.load)
+package object configuration {
+
+  type Configuration = Has[AppConfig] with Has[GeocodingConfig]
+
+  final case class Config(
+    app: AppConfig,
+    geocoding: GeocodingConfig
+  )
+
+  final case class AppConfig(
+    port: Int,
+    endpoint: String
+  )
+
+  final case class GeocodingConfig(
+    apikey: String
+  )
+
+  val appConfig: URIO[Has[AppConfig], AppConfig] = ZIO.access(_.get)
+  val geocodingConfig: URIO[Has[GeocodingConfig], GeocodingConfig] = ZIO.access(_.get)
+
+object Configuration {
+
+  val live: Layer[Throwable, Configuration] = ZLayer.fromEffectMany(
+    Task
+      .effect(ConfigSource.default.loadOrThrow[Config])
+      .map(c => Has(c.app) ++ Has(c.geocoding))
+  )
+}
 }

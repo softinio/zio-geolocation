@@ -16,7 +16,7 @@
 
 package ZioGeolocation
 
-import io.circe.generic.auto._, io.circe.syntax._
+import io.circe.generic.auto._
 import com.softwaremill.sttp._
 import com.softwaremill.sttp.circe._
 import com.vitorsvieira.iso._
